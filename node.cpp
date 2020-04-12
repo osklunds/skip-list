@@ -35,3 +35,15 @@ int Node::get_a_height(double probability) {
 
     return height;
 }
+
+int Node::height() {
+    return this->next_nodes.size();
+}
+
+Node *Node::get_next_node_at_index(int index) {
+    return this->next_nodes[index].get();
+}
+
+void Node::set_next_node_at_index(int index, unique_ptr<Node> node) {
+    this->next_nodes[index] = move(node);
+}
