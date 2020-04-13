@@ -2,7 +2,7 @@
 CXX      = g++
 CXXFLAGS = -Wall -std=c++17
 LDFLAGS  = 
-OBJFILES = main.o node.o
+OBJFILES = main.o node.o list.o
 TARGET   = program.o
 
 all: $(TARGET)
