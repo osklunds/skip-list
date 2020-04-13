@@ -16,7 +16,64 @@ int List::size() {
 }
 
 void List::insert(int value) {
+    shared_ptr<Node> new_node = make_shared<Node>(0.25);
+    new_node->set_value(value);
+    int height = new_node->height();
 
+    vector<shared_ptr<Node>> node_that_points_to_new_node_at_height;
+    vector<shared_ptr<Node>> node_that_new_node_points_to_at_height;
+
+    for (int i = 0; i < height; i++) {
+        node_that_points_to_new_node_at_height.push_back(shared_ptr<Node>{});
+        node_that_new_node_points_to_at_height.push_back(shared_ptr<Node>{});
+    }
+
+
+    shared_ptr<Node> current_node = head;
+
+    while (true) {
+        for (int i = current_node->height() - 1; i >= 0; i--) {
+            shared_ptr<Node> next_node = current_node->get_next_node_at_index(i);
+
+
+            if ((next_node == tail || value < next_node->get_value()) 
+                && i > 0) {
+                // The node we're looking for isn't beyond the next node
+                // and we haven't reached the bottom yet.
+
+                if (i < height) {
+                    node_that_points_to_new_node_at_height[i] = current_node;
+                    node_that_new_node_points_to_at_height[i] = next_node;
+                }
+
+                continue;
+            } else if ((next_node == tail || value < next_node->get_value()) 
+                && i == 0) {
+                // The node we're looking for isn't beyond the next node
+                // but we've reached the bottom.
+
+                // Insert the node here.
+                node_that_points_to_new_node_at_height[i] = current_node;
+                node_that_new_node_points_to_at_height[i] = next_node;
+
+                for (int j = 0; j < height; j++) {
+                    //cout << j << ". pointing at new node: " << node_that_points_to_new_node_at_height[j]->get_value() << " pointed on by new node: " << node_that_new_node_points_to_at_height[j]->get_value() << endl;
+                    node_that_points_to_new_node_at_height[j]->set_next_node_at_index(j, new_node);
+                    new_node->set_next_node_at_index(j, node_that_new_node_points_to_at_height[j]);
+                }
+
+                return;
+            } else if (value > next_node->get_value()) {
+                // The node we're looking for is beyond the next node.
+                current_node = next_node;
+                break;
+            } else {
+                // The node is none of not beyond and beyond.
+                // That means we've found the node.
+                return;
+            }
+        }
+    }
 }
 
 bool List::contains(int value) {
@@ -24,29 +81,26 @@ bool List::contains(int value) {
 
     while (true) {
         for (int i = current_node->height() - 1; i >= 0; i--) {
-            if (current_node == tail) {
-                return false;
-            }
-
             shared_ptr<Node> next_node = current_node->get_next_node_at_index(i);
 
-            if (next_node == tail) {
-                if (i > 0) {
-                    continue;
-                } else {
-                    return false;
-                }
-            }
-
-            if (value == next_node->get_value()) {
-                return true;
+            if ((next_node == tail || value < next_node->get_value()) 
+                && i > 0) {
+                // The node we're looking for isn't beyond the next node
+                // and we haven't reached the bottom yet.
+                continue;
+            } else if ((next_node == tail || value < next_node->get_value()) 
+                && i == 0) {
+                // The node we're looking for isn't beyond the next node
+                // but we've reached the bottom.
+                return false;
             } else if (value > next_node->get_value()) {
+                // The node we're looking for is beyond the next node.
                 current_node = next_node;
                 break;
-            } else if (value < next_node->get_value() && i > 0) {
-                continue;
-            } else { // value < next_node->get_value() && i == 0
-                return false;
+            } else {
+                // The node is none of not beyond and beyond.
+                // That means we've found the node.
+                return true;
             }
         }
     }

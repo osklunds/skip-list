@@ -12,6 +12,7 @@ int main() {
     Node::initialize_randomness();
 
     List list = List::example_list();
+    list.insert(19);
 
-    cout << list.contains(0) << endl;
+    cout << list.contains(17) << endl;
 }

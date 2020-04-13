@@ -19,7 +19,7 @@ clean:
 run: all
 	./program.o
 
-test: $(TARGET_T)
+tests: $(TARGET_T)
 	./tests.o
 
 $(TARGET_T): $(OBJFILES_T)
