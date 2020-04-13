@@ -19,4 +19,6 @@ public:
     bool contains(int value);
     void remove(int value);
     // TODO: Iterator
+
+    static List example_list();
 };

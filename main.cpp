@@ -1,22 +1,17 @@
 
 #include <iostream>
-#include <stdlib.h>
-#include <time.h>
 #include <memory>
 
 #include "node.h"
+#include "list.h"
 
 using namespace std;
 
 
 int main() {
-    srand(time(0));
-
     Node::initialize_randomness();
 
-    Node n(0.25);
+    List list = List::example_list();
 
-    for (int i = 0; i < n.next_nodes.size(); i++) {
-        cout << (n.next_nodes[i] == NULL) << endl;
-    }
+    cout << list.contains(0) << endl;
 }

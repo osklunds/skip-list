@@ -2,6 +2,7 @@
 #include "node.h"
 
 #include <iostream>
+#include <cassert>
 
 mt19937 Node::generator;
 uniform_real_distribution<> Node::distribution;
@@ -47,10 +48,27 @@ int Node::height() {
     return next_nodes.size();
 }
 
+void Node::increase_height_to(int new_height) {
+    int extra_height = new_height - height();
+    assert(extra_height > 0);
+
+    for (int i = 0; i < extra_height; i++) {
+        next_nodes.push_back(shared_ptr<Node>{});
+    }
+}
+
 shared_ptr<Node> Node::get_next_node_at_index(int index) {
     return next_nodes[index];
 }
 
 void Node::set_next_node_at_index(int index, shared_ptr<Node> node) {
     next_nodes[index] = node;
+}
+
+int Node::get_value() {
+    return value;
+}
+
+void Node::set_value(int value) {
+    this->value = value;
 }
