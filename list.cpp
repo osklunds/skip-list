@@ -20,6 +20,16 @@ void List::insert(int value) {
     new_node->set_value(value);
     int height = new_node->height();
 
+    int old_height = head->height();
+    if (height > old_height) {
+        head->increase_height_to(height);
+        tail->increase_height_to(height);
+
+        for (int i = old_height; i < head->height(); i++) {
+            head->set_next_node_at_index(i, tail);
+        }
+    }
+
     vector<shared_ptr<Node>> node_that_points_to_new_node_at_height;
     vector<shared_ptr<Node>> node_that_new_node_points_to_at_height;
 
