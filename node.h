@@ -14,7 +14,7 @@ public:
     static mt19937 generator;
     static uniform_real_distribution<> distribution;
 
-    vector<unique_ptr<Node>> next_nodes;
+    vector<shared_ptr<Node>> next_nodes;
 
     int get_a_height(double probability);
 
@@ -22,8 +22,8 @@ public:
     static void initialize_randomness();
 
     Node(double probability);
-    
+
     int height();
-    Node *get_next_node_at_index(int index);
-    void set_next_node_at_index(int index, unique_ptr<Node> node);
+    shared_ptr<Node> get_next_node_at_index(int index);
+    void set_next_node_at_index(int index, shared_ptr<Node> node);
 };

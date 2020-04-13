@@ -17,7 +17,7 @@ Node::Node(double probability) {
     int height = this->get_a_height(probability);
 
     for (int i = 0; i < height; i++) {
-        this->next_nodes.push_back(unique_ptr<Node>{});
+        this->next_nodes.push_back(shared_ptr<Node>{});
     }
 }
 
@@ -40,10 +40,10 @@ int Node::height() {
     return this->next_nodes.size();
 }
 
-Node *Node::get_next_node_at_index(int index) {
-    return this->next_nodes[index].get();
+shared_ptr<Node> Node::get_next_node_at_index(int index) {
+    return this->next_nodes[index];
 }
 
-void Node::set_next_node_at_index(int index, unique_ptr<Node> node) {
-    this->next_nodes[index] = move(node);
+void Node::set_next_node_at_index(int index, shared_ptr<Node> node) {
+    this->next_nodes[index] = node;
 }

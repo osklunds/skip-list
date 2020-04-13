@@ -5,7 +5,7 @@
 class List {
 //private:
 public:
-    // TODO: shared_ptr
+    
 public:
     int size();
     void insert(int value);
