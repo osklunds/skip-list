@@ -131,6 +131,7 @@ void List::insert(int value) {
                 }
 
                 check_invariants();
+                assert(contains(value));
 
                 return;
             } else if (value > next_node->get_value()) {
@@ -177,7 +178,55 @@ bool List::contains(int value) {
 }
 
 void List::remove(int value) {
+    vector<shared_ptr<Node>> node_that_points_to_old_node_at_height;
+    vector<shared_ptr<Node>> node_that_old_node_points_to_at_height;
 
+    for (int i = 0; i < head->height(); i++) {
+        node_that_points_to_old_node_at_height.push_back(shared_ptr<Node>{});
+        node_that_old_node_points_to_at_height.push_back(shared_ptr<Node>{});
+    }
+
+    shared_ptr<Node> current_node = head;
+
+    while (true) {
+        for (int i = current_node->height() - 1; i >= 0; i--) {
+            shared_ptr<Node> next_node = current_node->get_next_node_at_index(i);
+
+            if ((next_node == tail || value < next_node->get_value()) 
+                && i > 0) {
+                // The node we're looking for isn't beyond the next node
+                // and we haven't reached the bottom yet.
+                continue;
+            } else if ((next_node == tail || value < next_node->get_value()) 
+                && i == 0) {
+                // The node we're looking for isn't beyond the next node
+                // but we've reached the bottom.
+                // It wasn't here, so nothing to be done.
+
+                check_invariants();
+                assert(!contains(value));
+                return;
+            } else if (value > next_node->get_value()) {
+                // The node we're looking for is beyond the next node.
+                current_node = next_node;
+                break;
+            } else {
+                // The node is none of not beyond and beyond.
+                // That means we've found the node.                 
+
+                // Redirect to the next node past the node to remove.
+                // But only as long as the current node points to the node
+                // to remove.
+                for (int j = i; j >= 0; j--) {
+                    if (current_node->get_next_node_at_index(j) != next_node) {
+                        break;
+                    }
+
+                    current_node->set_next_node_at_index(j, next_node->get_next_node_at_index(j));
+                }
+            }
+        }
+    }    
 }
 
 /*

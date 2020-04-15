@@ -12,8 +12,12 @@ int main() {
     //Node::initialize_randomness();
 
     List list = List::example_list();
-    list.insert(7);
-    list.insert(48);
-    list.insert(34);
-    list.insert(20);
+
+    list.remove(34);
+    //list.remove(34);
+    //list.remove(35);
+
+    cout << list.contains(12) << endl;  
+
+
 }
