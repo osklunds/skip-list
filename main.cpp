@@ -9,10 +9,11 @@ using namespace std;
 
 
 int main() {
-    Node::initialize_randomness();
+    //Node::initialize_randomness();
 
-    List list;
-    list.insert(19);
-
-    cout << list.contains(19) << endl;
+    List list = List::example_list();
+    list.insert(7);
+    list.insert(48);
+    list.insert(34);
+    list.insert(20);
 }

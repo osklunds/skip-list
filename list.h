@@ -7,10 +7,11 @@
 
 
 class List {
-//private:
-public:
+private:
     shared_ptr<Node> head;
     shared_ptr<Node> tail;
+
+    void check_invariants();
 public:
     List();
 

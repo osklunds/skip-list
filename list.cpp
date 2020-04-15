@@ -4,6 +4,63 @@
 #include <iostream>
 
 
+// TODO: Refactor into a common while-for loop, that can
+// contain diffrent logic through lambdas.
+// Also make many smaller functions for the various tests.
+void List::check_invariants() {
+    // head and tail have the same height
+    assert(head->height() == tail->height());
+
+    // Everything tail points to is NULL
+    for (int i = 0; i < tail->height(); i++) {
+        assert(tail->get_next_node_at_index(i) == NULL);
+    }
+
+    // Also detects cycles. That's why it's placed earlier
+    auto current_node = head;
+    while (current_node != tail) {
+        for (int i = 0; i < current_node->height(); i++) {
+            // Everyhing a non-tail points to is non-NULL
+            auto next_node = current_node->get_next_node_at_index(i);
+            assert(next_node != NULL);
+
+            if (current_node != head && next_node != tail) {
+                // Everything a node points to is larger than itself
+                assert(current_node->get_value() < next_node->get_value());
+            }
+        }
+
+        current_node = current_node->get_next_node_at_index(0);
+    }
+    
+    current_node = head;
+
+    while (current_node != tail) {
+        //cout << "current node: " << current_node->get_value() << endl;
+
+        for (int i = 0; i < current_node->height(); i++) {
+            // Everyhing a non-tail points to is non-NULL
+            auto next_node = current_node->get_next_node_at_index(i);
+
+            //cout << "h: " << i << "   next node: " << next_node->get_value() << endl;
+            
+            // That what points at has height at least that height index.
+            assert(next_node->height() > i);
+
+            // That next node is the first node of height i
+            auto bottom_neighbor = current_node->get_next_node_at_index(0);
+            //cout << "bottom: " << bottom_neighbor->get_value() << endl;
+            while (bottom_neighbor != next_node) {
+                assert(bottom_neighbor->height() <= i);
+                bottom_neighbor = bottom_neighbor->get_next_node_at_index(0);
+                //cout << "bottom: " << bottom_neighbor->get_value() << endl;
+            }
+        }
+        current_node = current_node->get_next_node_at_index(0);
+    }
+}
+
+
 List::List() {
     head = make_shared<Node>(1);
     tail = make_shared<Node>(1);
@@ -15,6 +72,8 @@ int List::size() {
     return 0;
 }
 
+// TODO: refactor insert, contains, delete so that the common
+// while loop logic is shared. Use lambdas.
 void List::insert(int value) {
     shared_ptr<Node> new_node = make_shared<Node>(0.25);
     new_node->set_value(value);
@@ -37,7 +96,6 @@ void List::insert(int value) {
         node_that_points_to_new_node_at_height.push_back(shared_ptr<Node>{});
         node_that_new_node_points_to_at_height.push_back(shared_ptr<Node>{});
     }
-
 
     shared_ptr<Node> current_node = head;
 
@@ -71,6 +129,8 @@ void List::insert(int value) {
                     node_that_points_to_new_node_at_height[j]->set_next_node_at_index(j, new_node);
                     new_node->set_next_node_at_index(j, node_that_new_node_points_to_at_height[j]);
                 }
+
+                check_invariants();
 
                 return;
             } else if (value > next_node->get_value()) {
@@ -176,6 +236,8 @@ List List::example_list() {
 
     n4->set_next_node_at_index(0, list.tail);
     n4->set_next_node_at_index(1, list.tail);
+
+    list.check_invariants();
 
     return list;
 }
