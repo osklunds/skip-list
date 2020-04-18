@@ -370,6 +370,10 @@ int List::Iterator::operator*() {
     return current->get_value();
 }
 
+bool List::Iterator::operator==(const List::Iterator &other) {
+    return current == other.current;
+}
+
 bool List::Iterator::operator!=(const List::Iterator &other) {
     return current != other.current;
 }

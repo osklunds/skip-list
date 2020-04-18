@@ -13,9 +13,7 @@ int main() {
 
     List list = List::example_list();
 
-    for (auto it = list.begin(); it != list.end(); it++) {
-        cout << *it << endl;
-    }
+    
 
     
 }

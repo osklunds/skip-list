@@ -38,6 +38,7 @@ public:
         Iterator& operator++();
         Iterator operator++(int);
         int operator*();
+        bool operator==(const Iterator &other);
         bool operator!=(const Iterator &other);
     };
 

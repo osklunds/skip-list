@@ -131,3 +131,29 @@ TEST_CASE("size", "[size]") {
     list.remove(35);
     REQUIRE(list.size() == 2);
 }
+
+TEST_CASE("iteration", "[begin, end]") {
+    Node::initialize_randomness();
+    
+    List list = List::example_list();
+
+    auto it = list.begin();
+
+    REQUIRE(*it == 12);
+    it++;
+
+    REQUIRE(*it == 18);
+    it++;
+
+    REQUIRE(*it == 19);
+    it++;
+
+    REQUIRE(*it == 34);
+    it++;
+
+    REQUIRE(*it == 47);
+    it++;
+
+    bool res = it == list.end();
+    REQUIRE(res);
+}
