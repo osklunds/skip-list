@@ -91,3 +91,43 @@ TEST_CASE("remove and empty list", "[remove]") {
     REQUIRE(list.contains(34) == false);
     REQUIRE(list.contains(48) == true);
 }
+
+TEST_CASE("size", "[size]") {
+    Node::initialize_randomness();
+    
+    List list;
+    REQUIRE(list.size() == 0);
+    
+    list.insert(7);
+    REQUIRE(list.size() == 1);
+    
+    list.insert(48);
+    REQUIRE(list.size() == 2);
+    
+    list.insert(34);
+    REQUIRE(list.size() == 3);
+    
+    list.insert(20);
+    REQUIRE(list.size() == 4);
+
+    list.insert(20);
+    REQUIRE(list.size() == 4);
+
+    list.remove(7);
+    REQUIRE(list.size() == 3);
+    
+    list.remove(20);
+    REQUIRE(list.size() == 2);
+
+    list.insert(45);
+    REQUIRE(list.size() == 3);
+    
+    list.remove(34);
+    REQUIRE(list.size() == 2);
+    
+    list.remove(34);
+    REQUIRE(list.size() == 2);
+    
+    list.remove(35);
+    REQUIRE(list.size() == 2);
+}
