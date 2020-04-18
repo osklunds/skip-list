@@ -85,7 +85,7 @@ bool List::find(T find_helper) {
                 // The node we're looking for isn't beyond the next node
                 // and we haven't reached the bottom yet.
 
-                find_helper.case1(i, current_node, next_node);
+                find_helper.at_level_node_between_current_and_next(i, current_node, next_node);
 
                 continue;
             } else if ((next_node == tail || find_helper.value() < next_node->get_value()) 
@@ -93,7 +93,7 @@ bool List::find(T find_helper) {
                 // The node we're looking for isn't beyond the next node
                 // but we've reached the bottom.
 
-                find_helper.case2(i, current_node, next_node);
+                find_helper.at_bottom_node_between_current_and_next(current_node, next_node);
 
                 return false;
             } else if (find_helper.value() > next_node->get_value()) {
@@ -104,7 +104,7 @@ bool List::find(T find_helper) {
                 // The node is none of not beyond and beyond.
                 // That means we've found the node.
 
-                if (find_helper.case4(i, current_node, next_node)) {
+                if (find_helper.at_level_node_is_next(i, current_node, next_node)) {
                     return true;
                 }
             }
@@ -148,17 +148,16 @@ void List::insert(int value) {
             return _value;
         }
 
-        void case1(int i, shared_ptr<Node> current_node, shared_ptr<Node> next_node) {
+        void at_level_node_between_current_and_next(int i, shared_ptr<Node> current_node, shared_ptr<Node> next_node) {
             if (i < new_node->height()) {
                 node_that_points_to_new_node_at_height[i] = current_node;
                 node_that_new_node_points_to_at_height[i] = next_node;
             }
         }
 
-        void case2(int i, shared_ptr<Node> current_node, shared_ptr<Node> next_node) {
-            // Insert the node here.
-            node_that_points_to_new_node_at_height[i] = current_node;
-            node_that_new_node_points_to_at_height[i] = next_node;
+        void at_bottom_node_between_current_and_next(shared_ptr<Node> current_node, shared_ptr<Node> next_node) {
+            node_that_points_to_new_node_at_height[0] = current_node;
+            node_that_new_node_points_to_at_height[0] = next_node;
 
             for (int j = 0; j < new_node->height(); j++) {
                 //cout << j << ". pointing at new node: " << node_that_points_to_new_node_at_height[j]->get_value() << " pointed on by new node: " << node_that_new_node_points_to_at_height[j]->get_value() << endl;
@@ -170,7 +169,7 @@ void List::insert(int value) {
             assert(list.contains(_value));
         }
 
-        bool case4(int i, shared_ptr<Node> current_node, shared_ptr<Node> next_node) {
+        bool at_level_node_is_next(int i, shared_ptr<Node> current_node, shared_ptr<Node> next_node) {
             return true;
         }
     };
@@ -193,11 +192,11 @@ bool List::contains(int value) {
             return _value;
         }
 
-        void case1(int i, shared_ptr<Node> current_node, shared_ptr<Node> next_node) {};
+        void at_level_node_between_current_and_next(int i, shared_ptr<Node> current_node, shared_ptr<Node> next_node) {};
 
-        void case2(int i, shared_ptr<Node> current_node, shared_ptr<Node> next_node) {};
+        void at_bottom_node_between_current_and_next(shared_ptr<Node> current_node, shared_ptr<Node> next_node) {};
 
-        bool case4(int i, shared_ptr<Node> current_node, shared_ptr<Node> next_node) {
+        bool at_level_node_is_next(int i, shared_ptr<Node> current_node, shared_ptr<Node> next_node) {
             return true;
         }
     };
@@ -229,14 +228,14 @@ void List::remove(int value) {
             return _value;
         }
 
-        void case1(int i, shared_ptr<Node> current_node, shared_ptr<Node> next_node) {};
+        void at_level_node_between_current_and_next(int i, shared_ptr<Node> current_node, shared_ptr<Node> next_node) {};
 
-        void case2(int i, shared_ptr<Node> current_node, shared_ptr<Node> next_node) {
+        void at_bottom_node_between_current_and_next(shared_ptr<Node> current_node, shared_ptr<Node> next_node) {
             list.check_invariants();
             assert(!list.contains(_value));
         };
 
-        bool case4(int i, shared_ptr<Node> current_node, shared_ptr<Node> next_node) {
+        bool at_level_node_is_next(int i, shared_ptr<Node> current_node, shared_ptr<Node> next_node) {
             // Redirect to the next node past the node to remove.
             // But only as long as the current node points to the node
             // to remove.
