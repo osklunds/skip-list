@@ -9,15 +9,9 @@ using namespace std;
 
 
 int main() {
-    //Node::initialize_randomness();
+    Node::initialize_randomness();
 
     List list = List::example_list();
 
-    list.remove(34);
-    //list.remove(34);
-    //list.remove(35);
-
-    cout << list.contains(12) << endl;  
-
-
+    list.remove(34); 
 }

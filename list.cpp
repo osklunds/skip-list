@@ -58,6 +58,16 @@ void List::check_invariants() {
         }
         current_node = current_node->get_next_node_at_index(0);
     }
+
+    // That size is correct
+    current_node = head;
+    int size = 0;
+    while (current_node->get_next_node_at_index(0) != tail) {
+        current_node = current_node->get_next_node_at_index(0);
+        size++;
+    }
+
+    assert(this->size() == size);
 }
 
 
@@ -66,10 +76,12 @@ List::List() {
     tail = make_shared<Node>(1);
 
     head->set_next_node_at_index(0, tail);
+
+    _size = 0;
 }
 
 int List::size() {
-    return 0;
+    return _size;
 }
 
 template<typename T>
@@ -165,8 +177,7 @@ void List::insert(int value) {
                 new_node->set_next_node_at_index(j, node_that_new_node_points_to_at_height[j]);
             }
 
-            list.check_invariants();
-            assert(list.contains(_value));
+            list._size++;
         }
 
         bool at_level_node_is_next(int i, shared_ptr<Node> current_node, shared_ptr<Node> next_node) {
@@ -176,6 +187,9 @@ void List::insert(int value) {
 
     FindHelper find_helper(*this, value);
     find(find_helper);
+
+    check_invariants();
+    assert(contains(value));
 }
 
 bool List::contains(int value) {
@@ -230,12 +244,11 @@ void List::remove(int value) {
 
         void at_level_node_between_current_and_next(int i, shared_ptr<Node> current_node, shared_ptr<Node> next_node) {};
 
-        void at_bottom_node_between_current_and_next(shared_ptr<Node> current_node, shared_ptr<Node> next_node) {
-            list.check_invariants();
-            assert(!list.contains(_value));
-        };
+        void at_bottom_node_between_current_and_next(shared_ptr<Node> current_node, shared_ptr<Node> next_node) {};
 
         bool at_level_node_is_next(int i, shared_ptr<Node> current_node, shared_ptr<Node> next_node) {
+            //cout << "at_level_node_is_next " << i << " " << current_node->get_value() << " " << next_node->get_value() << endl;
+
             // Redirect to the next node past the node to remove.
             // But only as long as the current node points to the node
             // to remove.
@@ -245,6 +258,10 @@ void List::remove(int value) {
                 }
 
                 current_node->set_next_node_at_index(j, next_node->get_next_node_at_index(j));
+
+                if (j == 0) {
+                    list._size --;
+                }
             }
 
             return false;
@@ -253,6 +270,9 @@ void List::remove(int value) {
 
     FindHelper find_helper(*this, value);
     find(find_helper);
+
+    check_invariants();
+    assert(!contains(value));
 }
 
 /*
@@ -311,6 +331,8 @@ List List::example_list() {
 
     n4->set_next_node_at_index(0, list.tail);
     n4->set_next_node_at_index(1, list.tail);
+
+    list._size = 5;
 
     list.check_invariants();
 

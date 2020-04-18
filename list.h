@@ -11,6 +11,8 @@ private:
     shared_ptr<Node> head;
     shared_ptr<Node> tail;
 
+    int _size;
+
     void check_invariants();
     template<typename T>
     bool find(T find_helper);
