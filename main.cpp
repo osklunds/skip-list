@@ -13,5 +13,9 @@ int main() {
 
     List list = List::example_list();
 
-    list.remove(34); 
+    for (auto it = list.begin(); it != list.end(); it++) {
+        cout << *it << endl;
+    }
+
+    
 }

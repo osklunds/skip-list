@@ -338,3 +338,46 @@ List List::example_list() {
 
     return list;
 }
+
+List::Iterator::Iterator(shared_ptr<Node> c, shared_ptr<Node> t) {
+    current = c;
+    tail = t;
+}
+
+List::Iterator& List::Iterator::operator++() {
+    if (current->get_next_node_at_index(0) == NULL) {
+        exit(1);
+    } else {
+        current = current->get_next_node_at_index(0);
+    }
+
+    return *this;
+}
+
+List::Iterator List::Iterator::operator++(int) {
+    auto ret_val = *this;
+
+    ++(*this);
+
+    return ret_val;
+}
+
+int List::Iterator::operator*() {
+    if (current == tail) {
+        exit(1);
+    }
+
+    return current->get_value();
+}
+
+bool List::Iterator::operator!=(const List::Iterator &other) {
+    return current != other.current;
+}
+
+List::Iterator List::begin() {
+    return List::Iterator(head->get_next_node_at_index(0), tail);
+}
+
+List::Iterator List::end() {
+    return List::Iterator(tail, tail);
+}

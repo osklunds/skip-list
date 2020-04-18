@@ -16,6 +16,7 @@ private:
     void check_invariants();
     template<typename T>
     bool find(T find_helper);
+
 public:
     List();
 
@@ -26,4 +27,20 @@ public:
     // TODO: Iterator
 
     static List example_list();
+
+    class Iterator {
+    private:
+        shared_ptr<Node> current;
+        shared_ptr<Node> tail;
+
+    public:
+        Iterator(shared_ptr<Node> head, shared_ptr<Node> tail);
+        Iterator& operator++();
+        Iterator operator++(int);
+        int operator*();
+        bool operator!=(const Iterator &other);
+    };
+
+    Iterator begin();
+    Iterator end();
 };
