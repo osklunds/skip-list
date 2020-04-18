@@ -12,6 +12,8 @@ private:
     shared_ptr<Node> tail;
 
     void check_invariants();
+    template<typename T>
+    bool find(T find_helper);
 public:
     List();
 

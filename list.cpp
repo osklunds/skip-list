@@ -72,161 +72,188 @@ int List::size() {
     return 0;
 }
 
-// TODO: refactor insert, contains, delete so that the common
-// while loop logic is shared. Use lambdas.
-void List::insert(int value) {
-    shared_ptr<Node> new_node = make_shared<Node>(0.25);
-    new_node->set_value(value);
-    int height = new_node->height();
-
-    int old_height = head->height();
-    if (height > old_height) {
-        head->increase_height_to(height);
-        tail->increase_height_to(height);
-
-        for (int i = old_height; i < head->height(); i++) {
-            head->set_next_node_at_index(i, tail);
-        }
-    }
-
-    vector<shared_ptr<Node>> node_that_points_to_new_node_at_height;
-    vector<shared_ptr<Node>> node_that_new_node_points_to_at_height;
-
-    for (int i = 0; i < height; i++) {
-        node_that_points_to_new_node_at_height.push_back(shared_ptr<Node>{});
-        node_that_new_node_points_to_at_height.push_back(shared_ptr<Node>{});
-    }
-
+template<typename T>
+bool List::find(T find_helper) {
     shared_ptr<Node> current_node = head;
 
     while (true) {
         for (int i = current_node->height() - 1; i >= 0; i--) {
             shared_ptr<Node> next_node = current_node->get_next_node_at_index(i);
 
-
-            if ((next_node == tail || value < next_node->get_value()) 
+            if ((next_node == tail || find_helper.value() < next_node->get_value()) 
                 && i > 0) {
                 // The node we're looking for isn't beyond the next node
                 // and we haven't reached the bottom yet.
 
-                if (i < height) {
-                    node_that_points_to_new_node_at_height[i] = current_node;
-                    node_that_new_node_points_to_at_height[i] = next_node;
-                }
+                find_helper.case1(i, current_node, next_node);
 
                 continue;
-            } else if ((next_node == tail || value < next_node->get_value()) 
+            } else if ((next_node == tail || find_helper.value() < next_node->get_value()) 
                 && i == 0) {
                 // The node we're looking for isn't beyond the next node
                 // but we've reached the bottom.
 
-                // Insert the node here.
-                node_that_points_to_new_node_at_height[i] = current_node;
-                node_that_new_node_points_to_at_height[i] = next_node;
+                find_helper.case2(i, current_node, next_node);
 
-                for (int j = 0; j < height; j++) {
-                    //cout << j << ". pointing at new node: " << node_that_points_to_new_node_at_height[j]->get_value() << " pointed on by new node: " << node_that_new_node_points_to_at_height[j]->get_value() << endl;
-                    node_that_points_to_new_node_at_height[j]->set_next_node_at_index(j, new_node);
-                    new_node->set_next_node_at_index(j, node_that_new_node_points_to_at_height[j]);
-                }
-
-                check_invariants();
-                assert(contains(value));
-
-                return;
-            } else if (value > next_node->get_value()) {
+                return false;
+            } else if (find_helper.value() > next_node->get_value()) {
                 // The node we're looking for is beyond the next node.
                 current_node = next_node;
                 break;
             } else {
                 // The node is none of not beyond and beyond.
                 // That means we've found the node.
-                return;
+
+                if (find_helper.case4(i, current_node, next_node)) {
+                    return true;
+                }
             }
         }
     }
+}
+
+void List::insert(int value) {
+    class FindHelper {
+    private:
+        List &list;
+        int _value;
+
+        shared_ptr<Node> new_node;
+
+        vector<shared_ptr<Node>> node_that_points_to_new_node_at_height;
+        vector<shared_ptr<Node>> node_that_new_node_points_to_at_height;
+    public:
+        FindHelper(List &list, int value) : list(list), _value(value) {
+            new_node = make_shared<Node>(0.25);
+            new_node->set_value(value);
+            int height = new_node->height();
+
+            int old_height = list.head->height();
+            if (height > old_height) {
+                list.head->increase_height_to(height);
+                list.tail->increase_height_to(height);
+
+                for (int i = old_height; i < list.head->height(); i++) {
+                    list.head->set_next_node_at_index(i, list.tail);
+                }
+            }
+
+            for (int i = 0; i < height; i++) {
+                node_that_points_to_new_node_at_height.push_back(shared_ptr<Node>{});
+                node_that_new_node_points_to_at_height.push_back(shared_ptr<Node>{});
+            }
+        }
+
+        int value() {
+            return _value;
+        }
+
+        void case1(int i, shared_ptr<Node> current_node, shared_ptr<Node> next_node) {
+            if (i < new_node->height()) {
+                node_that_points_to_new_node_at_height[i] = current_node;
+                node_that_new_node_points_to_at_height[i] = next_node;
+            }
+        }
+
+        void case2(int i, shared_ptr<Node> current_node, shared_ptr<Node> next_node) {
+            // Insert the node here.
+            node_that_points_to_new_node_at_height[i] = current_node;
+            node_that_new_node_points_to_at_height[i] = next_node;
+
+            for (int j = 0; j < new_node->height(); j++) {
+                //cout << j << ". pointing at new node: " << node_that_points_to_new_node_at_height[j]->get_value() << " pointed on by new node: " << node_that_new_node_points_to_at_height[j]->get_value() << endl;
+                node_that_points_to_new_node_at_height[j]->set_next_node_at_index(j, new_node);
+                new_node->set_next_node_at_index(j, node_that_new_node_points_to_at_height[j]);
+            }
+
+            list.check_invariants();
+            assert(list.contains(_value));
+        }
+
+        bool case4(int i, shared_ptr<Node> current_node, shared_ptr<Node> next_node) {
+            return true;
+        }
+    };
+
+    FindHelper find_helper(*this, value);
+    find(find_helper);
 }
 
 bool List::contains(int value) {
-    shared_ptr<Node> current_node = head;
+    class FindHelper {
+    private:
+        int _value;
 
-    while (true) {
-        for (int i = current_node->height() - 1; i >= 0; i--) {
-            shared_ptr<Node> next_node = current_node->get_next_node_at_index(i);
-
-            if ((next_node == tail || value < next_node->get_value()) 
-                && i > 0) {
-                // The node we're looking for isn't beyond the next node
-                // and we haven't reached the bottom yet.
-                continue;
-            } else if ((next_node == tail || value < next_node->get_value()) 
-                && i == 0) {
-                // The node we're looking for isn't beyond the next node
-                // but we've reached the bottom.
-                return false;
-            } else if (value > next_node->get_value()) {
-                // The node we're looking for is beyond the next node.
-                current_node = next_node;
-                break;
-            } else {
-                // The node is none of not beyond and beyond.
-                // That means we've found the node.
-                return true;
-            }
+    public:
+        FindHelper(int value) {
+            _value = value;
         }
-    }
+
+        int value() {
+            return _value;
+        }
+
+        void case1(int i, shared_ptr<Node> current_node, shared_ptr<Node> next_node) {};
+
+        void case2(int i, shared_ptr<Node> current_node, shared_ptr<Node> next_node) {};
+
+        bool case4(int i, shared_ptr<Node> current_node, shared_ptr<Node> next_node) {
+            return true;
+        }
+    };
+
+    FindHelper find_helper(value);
+    return find(find_helper);
 }
 
 void List::remove(int value) {
-    vector<shared_ptr<Node>> node_that_points_to_old_node_at_height;
-    vector<shared_ptr<Node>> node_that_old_node_points_to_at_height;
+    class FindHelper {
+    private:
+        List &list;
+        int _value;
 
-    for (int i = 0; i < head->height(); i++) {
-        node_that_points_to_old_node_at_height.push_back(shared_ptr<Node>{});
-        node_that_old_node_points_to_at_height.push_back(shared_ptr<Node>{});
-    }
+        vector<shared_ptr<Node>> node_that_points_to_old_node_at_height;
+        vector<shared_ptr<Node>> node_that_old_node_points_to_at_height;
 
-    shared_ptr<Node> current_node = head;
+    public:
+        FindHelper(List &list, int value) : list(list) {
+            _value = value;
 
-    while (true) {
-        for (int i = current_node->height() - 1; i >= 0; i--) {
-            shared_ptr<Node> next_node = current_node->get_next_node_at_index(i);
-
-            if ((next_node == tail || value < next_node->get_value()) 
-                && i > 0) {
-                // The node we're looking for isn't beyond the next node
-                // and we haven't reached the bottom yet.
-                continue;
-            } else if ((next_node == tail || value < next_node->get_value()) 
-                && i == 0) {
-                // The node we're looking for isn't beyond the next node
-                // but we've reached the bottom.
-                // It wasn't here, so nothing to be done.
-
-                check_invariants();
-                assert(!contains(value));
-                return;
-            } else if (value > next_node->get_value()) {
-                // The node we're looking for is beyond the next node.
-                current_node = next_node;
-                break;
-            } else {
-                // The node is none of not beyond and beyond.
-                // That means we've found the node.                 
-
-                // Redirect to the next node past the node to remove.
-                // But only as long as the current node points to the node
-                // to remove.
-                for (int j = i; j >= 0; j--) {
-                    if (current_node->get_next_node_at_index(j) != next_node) {
-                        break;
-                    }
-
-                    current_node->set_next_node_at_index(j, next_node->get_next_node_at_index(j));
-                }
+            for (int i = 0; i < list.head->height(); i++) {
+                node_that_points_to_old_node_at_height.push_back(shared_ptr<Node>{});
+                node_that_old_node_points_to_at_height.push_back(shared_ptr<Node>{});
             }
         }
-    }    
+
+        int value() {
+            return _value;
+        }
+
+        void case1(int i, shared_ptr<Node> current_node, shared_ptr<Node> next_node) {};
+
+        void case2(int i, shared_ptr<Node> current_node, shared_ptr<Node> next_node) {
+            list.check_invariants();
+            assert(!list.contains(_value));
+        };
+
+        bool case4(int i, shared_ptr<Node> current_node, shared_ptr<Node> next_node) {
+            // Redirect to the next node past the node to remove.
+            // But only as long as the current node points to the node
+            // to remove.
+            for (int j = i; j >= 0; j--) {
+                if (current_node->get_next_node_at_index(j) != next_node) {
+                    break;
+                }
+
+                current_node->set_next_node_at_index(j, next_node->get_next_node_at_index(j));
+            }
+
+            return false;
+        }
+    };
+
+    FindHelper find_helper(*this, value);
+    find(find_helper);
 }
 
 /*
