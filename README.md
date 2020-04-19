@@ -1,7 +1,7 @@
 
 # Skip list
 
-This project is a C++ implementation of the [skip list[(https://en.wikipedia.org/wiki/Skip_list) data structure. A skip list has the interface of a set, meaning it has the operations `insert()`, `contains()` and `remove()`. All of them have `O(log n)` time complexity.
+This project is a C++ implementation of the [skip list](https://en.wikipedia.org/wiki/Skip_list) data structure. A skip list has the interface of a set, meaning it has the operations `insert()`, `contains()` and `remove()`. All of them have `O(log n)` time complexity.
 
 ## Repository overview
 
