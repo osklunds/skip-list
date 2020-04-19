@@ -2,10 +2,10 @@
 #include "list.h"
 
 #include <iostream>
+#include <cassert>
 
 
 void List::check_invariants() {
-    return;
     check_head_tail_same_height();
     check_tail_points_to_null();
     check_strictly_increasing_non_null();

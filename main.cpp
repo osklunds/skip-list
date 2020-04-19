@@ -12,8 +12,8 @@ int main() {
     Node::initialize_randomness();
     srand(time(0));
 
-    const int NUMBER_OF_INSERTS = 5000;
-    const int NUMBER_OF_CONTAINS = 100000;
+    const int NUMBER_OF_INSERTS = 500;
+    const int NUMBER_OF_CONTAINS = 1000;
 
     List list;
 
@@ -33,5 +33,5 @@ int main() {
     auto duration = (end-start) / chrono::milliseconds(1);
 
 
-    cout << "On a list with " << NUMBER_OF_INSERTS << " number of insertions, " << NUMBER_OF_CONTAINS << " contains took " << duration << " milliseconds." << endl;
+    cout << "On a list with " << list.size() << " number of elements, " << NUMBER_OF_CONTAINS << " contains took " << duration << " milliseconds." << endl;
 }
