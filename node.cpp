@@ -11,7 +11,7 @@ uniform_real_distribution<> Node::distribution;
 void Node::initialize_randomness() {
     random_device rd;
     generator = mt19937(rd());
-    distribution = uniform_real_distribution(0.0, 1.0);
+    distribution = uniform_real_distribution<double>(0.0, 1.0);
 }
 
 int Node::get_a_height(double probability) {

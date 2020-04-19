@@ -43,3 +43,7 @@ As the table shows, the number of elements does affect the time for `contains()`
 ## 3rd party code
 
 The unit tests in this project are done using [the Catch2 framework](https://github.com/catchorg/Catch2). It's being used under the BSL-1.0 license. The corresponding license file is `3RD-PARTY-LICENSES/catch2-license.txt`.
+
+## Compatibility
+
+This program was developed on Mac (macOS 10.14), but it should also work fine on Linux.
