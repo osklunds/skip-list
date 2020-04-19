@@ -5,6 +5,7 @@
 
 
 void List::check_invariants() {
+    return;
     check_head_tail_same_height();
     check_tail_points_to_null();
     check_strictly_increasing_non_null();
@@ -92,6 +93,14 @@ List::List() {
     head->set_next_node_at_index(0, tail);
 
     _size = 0;
+}
+
+List::~List() {
+    // This is to clean in a good way. The default way causes
+    // the stack to overflow if the list is very long.
+    while (head != tail) {
+        head = head->get_next_node_at_index(0);
+    }
 }
 
 int List::size() {

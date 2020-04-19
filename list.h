@@ -26,6 +26,7 @@ private:
 
 public:
     List();
+    ~List();
 
     int size();
     void insert(int value);
