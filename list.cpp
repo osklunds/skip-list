@@ -4,64 +4,78 @@
 #include <iostream>
 
 
-// TODO: Refactor into a common while-for loop, that can
-// contain diffrent logic through lambdas.
-// Also make many smaller functions for the various tests.
 void List::check_invariants() {
-    // head and tail have the same height
-    assert(head->height() == tail->height());
+    check_head_tail_same_height();
+    check_tail_points_to_null();
+    check_strictly_increasing_non_null();
+    check_next_has_sufficient_height();
+    check_next_is_first_of_its_height();
+    check_size();
+}
 
-    // Everything tail points to is NULL
+void List::check_head_tail_same_height() {
+    assert(head->height() == tail->height());
+}
+
+void List::check_tail_points_to_null() {
     for (int i = 0; i < tail->height(); i++) {
         assert(tail->get_next_node_at_index(i) == NULL);
     }
+}
 
-    // Also detects cycles. That's why it's placed earlier
+void List::check_strictly_increasing_non_null() {
     auto current_node = head;
+
     while (current_node != tail) {
         for (int i = 0; i < current_node->height(); i++) {
-            // Everyhing a non-tail points to is non-NULL
             auto next_node = current_node->get_next_node_at_index(i);
             assert(next_node != NULL);
 
             if (current_node != head && next_node != tail) {
-                // Everything a node points to is larger than itself
                 assert(current_node->get_value() < next_node->get_value());
             }
         }
 
         current_node = current_node->get_next_node_at_index(0);
     }
-    
-    current_node = head;
+}
+
+void List::check_next_has_sufficient_height() {
+    auto current_node = head;
 
     while (current_node != tail) {
-        //cout << "current node: " << current_node->get_value() << endl;
-
         for (int i = 0; i < current_node->height(); i++) {
-            // Everyhing a non-tail points to is non-NULL
             auto next_node = current_node->get_next_node_at_index(i);
-
-            //cout << "h: " << i << "   next node: " << next_node->get_value() << endl;
-            
-            // That what points at has height at least that height index.
             assert(next_node->height() > i);
-
-            // That next node is the first node of height i
-            auto bottom_neighbor = current_node->get_next_node_at_index(0);
-            //cout << "bottom: " << bottom_neighbor->get_value() << endl;
-            while (bottom_neighbor != next_node) {
-                assert(bottom_neighbor->height() <= i);
-                bottom_neighbor = bottom_neighbor->get_next_node_at_index(0);
-                //cout << "bottom: " << bottom_neighbor->get_value() << endl;
-            }
         }
+
         current_node = current_node->get_next_node_at_index(0);
     }
+}
 
-    // That size is correct
-    current_node = head;
+void List::check_next_is_first_of_its_height() {
+    auto current_node = head;
+
+    while (current_node != tail) {
+        for (int i = 0; i < current_node->height(); i++) {
+            auto next_node = current_node->get_next_node_at_index(i);
+            auto bottom_neighbor = current_node->get_next_node_at_index(0);
+    
+            while (bottom_neighbor != next_node) {
+                assert(bottom_neighbor->height() <= i);
+
+                bottom_neighbor = bottom_neighbor->get_next_node_at_index(0);
+            }
+        }
+
+        current_node = current_node->get_next_node_at_index(0);
+    }
+}
+
+void List::check_size() {
+    auto current_node = head;
     int size = 0;
+
     while (current_node->get_next_node_at_index(0) != tail) {
         current_node = current_node->get_next_node_at_index(0);
         size++;
@@ -172,7 +186,6 @@ void List::insert(int value) {
             node_that_new_node_points_to_at_height[0] = next_node;
 
             for (int j = 0; j < new_node->height(); j++) {
-                //cout << j << ". pointing at new node: " << node_that_points_to_new_node_at_height[j]->get_value() << " pointed on by new node: " << node_that_new_node_points_to_at_height[j]->get_value() << endl;
                 node_that_points_to_new_node_at_height[j]->set_next_node_at_index(j, new_node);
                 new_node->set_next_node_at_index(j, node_that_new_node_points_to_at_height[j]);
             }
@@ -247,8 +260,6 @@ void List::remove(int value) {
         void at_bottom_node_between_current_and_next(shared_ptr<Node> current_node, shared_ptr<Node> next_node) {};
 
         bool at_level_node_is_next(int i, shared_ptr<Node> current_node, shared_ptr<Node> next_node) {
-            //cout << "at_level_node_is_next " << i << " " << current_node->get_value() << " " << next_node->get_value() << endl;
-
             // Redirect to the next node past the node to remove.
             // But only as long as the current node points to the node
             // to remove.
